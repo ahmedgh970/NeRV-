@@ -16,7 +16,7 @@ Official Pytorch implementation of [NeRV++: An Enhanced Implicit Neural Video Re
 <!-- /code_chunk_output -->
 
 ## Tags
-<code>Swin Transformer</code> <code>ConvNeXt</code> <code>Adaptive Resolution</code> <code>Neural Codecs</code> <code>Image Compression</code> <code>TensorFlow</code>
+<code>Implicit Neural Representation</code> <code>Neural Codec</code> <code>Neural Video Compression</code> <code>Pytorch</code>
 
 ## Overall NeRV++ Framework
 ![NeRV++ framework](https://github.com/ahmedgh970/NeRV++/blob/main/figures/NeRV++.png)
@@ -25,7 +25,7 @@ Official Pytorch implementation of [NeRV++: An Enhanced Implicit Neural Video Re
 Please do not hesitate to open an issue to inform of any problem you may find within this repository. Also, you can [email me](mailto:ahmed.ghorbel888@gmail.com?subject=[GitHub]) for questions or comments. 
 
 ## Requirements
-<code>Python >= 3.6</code> <code>pytorch</code>
+<code>Python >= 3.6</code> <code>Pytorch</code>
 
 All packages used in this repository are listed in [requirements.txt](https://github.com/ahmedgh970/NeRV++/blob/main/requirements.txt).
 To install those, run:
