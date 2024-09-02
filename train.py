@@ -11,7 +11,7 @@ import torch.utils.data
 import torchvision.transforms as transforms
 from torch.utils.tensorboard import SummaryWriter
 
-from model_best_attn2d import CustomDataSet, Generator
+from models.model_best import CustomDataSet, Generator
 from utils import *
 
 
@@ -174,8 +174,6 @@ def train(local_rank, args):
 
             param_list.append(model.layers[layer_ind].nerv_block[0].conv)
             
-            param_list.append(model.layers[layer_ind].rffn.attn.qkv)
-            param_list.append(model.layers[layer_ind].rffn.attn.proj)         
             param_list.append(model.layers[layer_ind].rffn.ffn[0])
             param_list.append(model.layers[layer_ind].rffn.ffn[2])
             param_list.append(model.layers[layer_ind].rffn.ffn[5])
@@ -224,8 +222,7 @@ def train(local_rank, args):
         model = model.cuda()
 
     optimizer = optim.Adam(model.parameters(), betas=(args.beta, 0.999))
-    # optimizer = optim.SGD(model.parameters(), ????)
-
+    
     # resume from args.weight
     checkpoint = None
     loc = 'cuda:{}'.format(local_rank if local_rank is not None else 0)
@@ -507,8 +504,8 @@ def train(local_rank, args):
                 writer.add_scalar(f'Val/MSSSIM_{h}X{w}_gap{args.test_gap}', val_msssim[-1], epoch+1)
                 writer.add_scalar(f'Val/best_PSNR_{h}X{w}_gap{args.test_gap}', val_best_psnr, epoch+1)
                 writer.add_scalar(f'Val/best_MSSSIM_{h}X{w}_gap{args.test_gap}', val_best_msssim, epoch+1)
-                print_str += '\t{}p: current: {:.2f}\tbest: {:.2f} \tbest_msssim: {:.4f}\t Time/epoch: {:.2f}'.format(h, val_psnr[-1].item(),
-                     val_best_psnr.item(), val_best_msssim.item(), (val_end_time - val_start_time).total_seconds())
+                print_str += '\t{}p: current: {:.2f}\tbest: {:.2f} \tbest_msssim: {:.4f}\t Time/epoch: {:.2f}'.format(h, val_psnr[-1].item(), \
+                    val_best_psnr.item(), val_best_msssim.item(), (val_end_time - val_start_time).total_seconds())
                 print(print_str)
                 with open('{}/rank0.txt'.format(args.outf), 'a') as f:
                     f.write(print_str + '\n')

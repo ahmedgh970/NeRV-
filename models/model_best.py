@@ -1,18 +1,18 @@
 import os
-import math
 
-import numpy as np
 import torch
-from torch import Tensor
 import torch.nn as nn
-from PIL import Image
 from torch.utils.data import Dataset
 import torch.nn.functional as F
-from timm.models.layers import trunc_normal_
-from functools import partial
-from utils import *
-from einops import rearrange, repeat
+import torchinfo
 
+import numpy as np
+from PIL import Image
+
+from timm.models.layers import trunc_normal_
+
+from models.layers import Gmlp, ResidualFFN, GatedCNNBlock
+from utils import *
 
 
 class CustomDataSet(Dataset):
@@ -125,142 +125,6 @@ class CustomConv(nn.Module):
     def forward(self, x):
         return self.up_scale(self.conv(x))
 # --------------------------------------------------------
-    
-
-# --------------------- G-MLP ------------------------
-class Gmlp(nn.Module):
-    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
-        super().__init__()
-        out_features = out_features or in_features
-        hidden_features = hidden_features or in_features
-
-        self.fc1 = nn.Linear(in_features, 2 * hidden_features)
-        self.act = act_layer()
-        self.fc2 = nn.Linear(hidden_features, out_features)
-        self.drop = nn.Dropout(drop)
-
-    def _init_weights(self, m):
-        if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight, std=.02)
-            if isinstance(m, nn.Linear) and m.bias is not None:
-                nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
-
-    def forward(self, x):
-        x = self.fc1(x)
-        x, z = x.chunk(2, dim=(-1))
-        x = self.fc2(x * self.act(z))
-        x = self.drop(x)
-        return x
-# --------------------------------------------------------
-
-
-# --------------------- Residual FFN ------------------------
-class ResidualFFN(nn.Module):
-    def __init__(self, in_features, dropout=0.,):
-        super(ResidualFFN, self).__init__()
-        self.ffn = nn.Sequential(
-            nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1, groups=in_features),
-            nn.Dropout(dropout),
-            nn.Conv2d(in_features, in_features, kernel_size=1, stride=1, padding=0),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Conv2d(in_features, in_features, kernel_size=1, stride=1, padding=0),
-            nn.Dropout(dropout),
-        )
-        self.apply(self._init_weights)
-
-    def _init_weights(self, m):
-        if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight, std=.02)
-            if isinstance(m, nn.Linear) and m.bias is not None:
-                nn.init.constant_(m.bias, 0)
-        if isinstance(m, nn.Conv2d):
-            nn.init.xavier_uniform_(m.weight)
-            if isinstance(m, nn.Conv2d) and m.bias is not None:
-                nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
-
-    def forward(self, x):
-        return self.ffn(x) + x
-# --------------------------------------------------------
-
-
-# --------------------- GatedCNNBlock ------------------------
-class GatedCNNBlock(nn.Module):
-    r""" Our implementation of Gated CNN Block: https://arxiv.org/pdf/1612.08083
-    Args:
-        conv_ratio: control the number of channels to conduct depthwise convolution.
-            Conduct convolution on partial channels can improve paraitcal efficiency.
-            The idea of partial channels is from ShuffleNet V2 (https://arxiv.org/abs/1807.11164) and
-            also used by InceptionNeXt (https://arxiv.org/abs/2303.16900) and FasterNet (https://arxiv.org/abs/2303.03667)
-    """
-    def __init__(self, dim, expansion_ratio=8/3, kernel_size=7, conv_ratio=1.0,
-                 act_layer=nn.GELU,
-                 drop_path=0.,
-                 **kwargs):
-        super().__init__()
-        hidden = int(expansion_ratio * dim)
-        self.fc1 = nn.Linear(dim, hidden * 2)
-        self.act = act_layer()
-        conv_channels = int(conv_ratio * dim)
-        self.split_indices = (hidden, hidden - conv_channels, conv_channels)
-        self.conv = nn.Conv2d(conv_channels, conv_channels, kernel_size=kernel_size, padding=kernel_size//2, groups=conv_channels)
-        self.fc2 = nn.Linear(hidden, dim)
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
-
-    def forward(self, x):
-        x = x.permute(0, 2, 3, 1) # [B, C, H, W] -> [B, H, W, C]
-        shortcut = x # [B, H, W, C]
-        g, i, c = torch.split(self.fc1(x), self.split_indices, dim=-1)
-        c = c.permute(0, 3, 1, 2) # [B, H, W, C] -> [B, C, H, W]
-        c = self.conv(c)
-        c = c.permute(0, 2, 3, 1) # [B, C, H, W] -> [B, H, W, C]
-        x = self.fc2(self.act(g) * torch.cat((i, c), dim=-1))
-        x = self.drop_path(x)
-        x = x + shortcut
-        x = x.permute(0, 3, 1, 2) # [B, H, W, C] -> [B, C, H, W]
-        return x
-# --------------------------------------------------------
-
-
-# -------------------- Mamba Block -----------------------
-class MambaVisionMixer(nn.Module):
-    def __init__(self, dim, d_state=16, kernel_size=3):
-    super().__init__()
-        self.d_state = d_state
-        self.dt_rank = math.ceil(dim / 16)
-        self.in_proj = nn.Linear(self.d_model, self.d_inner)
-        self.x_proj = nn.Linear(dim//2, self.dt_rank + self.d_state *2)
-        self.conv1d_x = nn.Conv1d(dim//2, dim//2, kernel_size=kernel_size, padding=’same’, groups=dim//2)
-        self.conv1d_z = nn.Conv1d(dim//2, dim//2, kernel_size=kernel_size, padding=’same’, groups=dim//2)
-        self.dt_proj = nn.Linear(self.dt_rank, dim//2)
-        dt = torch.exp(torch.rand(self.dim//2) * (math.log(dt_max) math.log(dt_min)) + math.log(dt_min)
-        A_log = torch.log(repeat(torch.arange(1, self.d_state + 1), n -> d n, d=dim//2))
-        self.A_log = nn.Parameter(A_log)
-        self.D = nn.Parameter(torch.ones(dim//2))
-        self.out_proj = nn.Linear(dim, dim)
-        
-    def forward(self, hidden_states):
-        xz = rearrange(self.in_proj(hidden_states), b l d -> b d l)
-        x, z = xz.chunk(2, dim=1)
-        A = -torch.exp(self.A_log)
-        x = F.silu(self.conv1d_x(x))
-        z = F.silu(self.conv1d_z(z))
-        seqlen = hidden_states.shape[1]
-        x_dbl = self.x_proj(rearrange(x, b d l -> (b l) d))
-        dt, B, C = torch.split(x_dbl, [self.dt_rank, self.d_state, self.d_state], dim=-1)
-        dt = rearrange(self.dt_proj(dt), (b l) d -> b d l, l=seqlen)
-        B = rearrange(B, (b l) dstate -> b dstate l, l=seqlen)
-        C = rearrange(C, (b l) dstate -> b dstate l, l=seqlen)
-        x_ssm = selective_scan_fn(x, dt, A, B, C, D)
-        hidden_states = rearrange(torch.cat([x_ssm, z], dim=1), b d l -> b l d)
-        return self.out_proj(hidden_states)
-# --------------------------------------------------------
 
 
 # --------------------- Conv Block ------------------------
@@ -295,8 +159,6 @@ class ConvBlock(nn.Module):
 # --------------------------------------------------------
 
 
-
-
 class NervPlusBlock(nn.Module):
     def __init__(self, resolution, step, **kargs):
         super(NervPlusBlock, self).__init__()
@@ -319,7 +181,7 @@ class NervPlusBlock(nn.Module):
         )
         
         self.rffn = ResidualFFN(in_features=kargs['new_ngf'])
-                                
+        
         self.stride = kargs['stride']
 
         self.apply(self._init_weights)
@@ -424,7 +286,7 @@ class Generator(nn.Module):
     
 
 
-'''
+#'''
 idx = 1
 x = torch.randn(idx).to("cuda")
 print(x.shape)
