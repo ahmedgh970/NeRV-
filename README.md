@@ -19,7 +19,7 @@ Official Pytorch implementation of [NeRV++: An Enhanced Implicit Neural Video Re
 <code>Implicit Neural Representation</code> <code>Neural Codec</code> <code>Neural Video Compression</code> <code>Pytorch</code>
 
 ## Overall NeRV++ Framework
-![NeRV++ framework](https://github.com/ahmedgh970/NeRV-PlusPlus/docs/asset/NeRV++.png)
+![NeRV++ framework](docs/asset/NeRV++.png)
 
 ## Disclaimer
 Please do not hesitate to open an issue to inform of any problem you may find within this repository. Also, you can [email me](mailto:ahmed.ghorbel888@gmail.com?subject=[GitHub]) for questions or comments. 
