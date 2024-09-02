@@ -1,5 +1,5 @@
 # NeRV++: An Enhanced Implicit Neural Video Representation
-Official Pytorch implementation of [NeRV++: An Enhanced Implicit Neural Video Representation](https://ieeexplore.ieee.org/document/) (Coming Soon). 
+Official Pytorch implementation of [NeRV++: An Enhanced Implicit Neural Video Representation](https://arxiv.org/abs/2402.18305). 
 
 * [NeRV++](#nerv++)
   * [Tags](#tags)
@@ -110,7 +110,7 @@ If you use this library for research purposes, please cite:
 ```
 @INPROCEEDINGS{,
   author={Ghorbel, Ahmed and Hamidouche, Wassim},
-  booktitle={2024 IEEE International Conference on Image Processing (ICIP)}, 
+  booktitle={}, 
   title={NeRV++: An Enhanced Implicit Neural Video Representation}, 
   year={2025},
   volume={},
