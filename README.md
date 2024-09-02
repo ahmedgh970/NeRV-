@@ -8,8 +8,8 @@ Official Pytorch implementation of [NeRV++: An Enhanced Implicit Neural Video Re
   * [Documentation](#documentation)
   * [Requirements](#requirements)
   * [Folder Structure](#folder-structure)
-  * [CLI-Usage](#cli-usage)
-  * [Rate-Distortion Coding Performance](#rate-distortion-coding-performance)
+  * [Reproducing Experiments](#reproducing-experiments)
+  * [Model Pruning](#model-pruning)
   * [Citation](#citation)
   * [License](#license)
     
@@ -19,7 +19,7 @@ Official Pytorch implementation of [NeRV++: An Enhanced Implicit Neural Video Re
 <code>Implicit Neural Representation</code> <code>Neural Codec</code> <code>Neural Video Compression</code> <code>Pytorch</code>
 
 ## Overall NeRV++ Framework
-![NeRV++ framework](https://github.com/ahmedgh970/NeRV-PlusPlus/asset/main/figures/NeRV++.png)
+![NeRV++ framework](https://github.com/ahmedgh970/NeRV-PlusPlus/docs/asset/NeRV++.png)
 
 ## Disclaimer
 Please do not hesitate to open an issue to inform of any problem you may find within this repository. Also, you can [email me](mailto:ahmed.ghorbel888@gmail.com?subject=[GitHub]) for questions or comments. 
@@ -32,6 +32,8 @@ To install those, run:
 ```
 pip install -r requirements.txt
 ```
+
+## Folder Structure
 
 ## Reproducing experiments
 
