@@ -1,0 +1,6 @@
+# ninja log v5
+0	15863	1719937816981182821	/data/ahmed.ghorbel/workdir/test/EfficientVMamba/selective_scan/build/temp.linux-x86_64-cpython-310/csrc/selective_scan/selective_scan.o	82d94f4fe8d8a45c
+1	18704	1719937819817210836	/data/ahmed.ghorbel/workdir/test/EfficientVMamba/selective_scan/build/temp.linux-x86_64-cpython-310/csrc/selective_scan/selective_scan_core_fwd2.o	a98e8a9b9222fa03
+1	25141	1719937826253274414	/data/ahmed.ghorbel/workdir/test/EfficientVMamba/selective_scan/build/temp.linux-x86_64-cpython-310/csrc/selective_scan/selective_scan_core_fwd3.o	4040bdcf557c7dc2
+1	32397	1719937833509346092	/data/ahmed.ghorbel/workdir/test/EfficientVMamba/selective_scan/build/temp.linux-x86_64-cpython-310/csrc/selective_scan/selective_scan_core_fwd4.o	3bb627e8b86a3ab
+0	51469	1719937852577534455	/data/ahmed.ghorbel/workdir/test/EfficientVMamba/selective_scan/build/temp.linux-x86_64-cpython-310/csrc/selective_scan/selective_scan_core.o	efaf91cad8697c1c

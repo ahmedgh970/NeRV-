@@ -1,0 +1,23 @@
+#--- nerv
+#pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu118
+numpy
+pytorch_msssim
+tqdm
+dahuffman
+Pillow
+yaspin
+tensorboard
+timm
+
+#-- vmamba
+#-- cd selective_scan && pip install . && pytest
+packaging
+pytest
+chardet 
+yacs 
+termcolor
+submitit 
+tensorboardX
+fvcore
+seaborn
+mamba-ssm
