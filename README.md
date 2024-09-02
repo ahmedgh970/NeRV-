@@ -38,13 +38,15 @@ pip install -r requirements.txt
 NeRV-PlusPlus-main
 ├── data/                         # Video data dir
 ├── docs/asset                    # Documentation figures               
-├── mamba/                        # Mamba model dir
+├── selective_scan/               # Selective SSM dir
 ├── models/                       # Backbones dir
-│   └── layers.py                 # Layers and utility functions
-│   └── model_td.py               # TrafficDiffuser backbone               
+│   └── layers.py                 # Layers
+│   └── model_best.py             # NeRV++ backbone    
+|   └── ...           
 ├── requirements.txt              # Requirements
-├── sample.py                     # Sampling script 
-└── train.py                      # Training script
+├── utils.py                      # Utility functions
+├── train.py                      # Training script
+└── main.py                       # Main script
 ```
 
 ## Reproducing experiments

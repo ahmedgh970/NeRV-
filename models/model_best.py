@@ -12,7 +12,6 @@ from PIL import Image
 from timm.models.layers import trunc_normal_
 
 from models.layers import Gmlp, ResidualFFN, GatedCNNBlock
-from utils import *
 
 
 class CustomDataSet(Dataset):
@@ -283,41 +282,3 @@ class Generator(nn.Module):
                 img_out = torch.sigmoid(img_out) if self.sigmoid else (torch.tanh(img_out) + 1) * 0.5
                 out_list.append(img_out)
         return  out_list
-    
-
-
-#'''
-idx = 1
-x = torch.randn(idx).to("cuda")
-print(x.shape)
-
-PE = PositionalEncoding('1.25_40').to("cuda")
-inpt = PE(x)
-
-print(inpt.shape)
-
-model = Generator(
-    embed_length=PE.embed_length,
-    stem_dim_num='512_1',
-    fc_hw_dim='9_16_8',
-    expansion=1,
-    num_blocks=1,
-    bias=True,
-    act='swish',
-    reduction=2,
-    stride_list=[5, 2, 2, 2, 2],
-    sin_res=True,
-    sigmoid=True,
-    lower_width=80,
-    conv_type='conv',
-    norm='none'
-).to("cuda")
-
-out_list = model(inpt)
-print('length de out_list: ', out_list[0].shape)
-print('shape of out_list[0]: ', out_list[0].shape)
-
-# Calculate the total number of trainable parameters
-trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-print(f"Total number of trainable parameters: {trainable_params}")
-#'''

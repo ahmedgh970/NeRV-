@@ -13,7 +13,7 @@ from timm.models.layers import trunc_normal_
 from mamba_ssm import Mamba
 
 from layers import Gmlp, ResidualFFN, generate_tuples, PatchEmbed
-from ..utils import *
+#from utils import *
 
 
 
