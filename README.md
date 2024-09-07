@@ -27,7 +27,7 @@ Please do not hesitate to open an issue to inform of any problem you may find wi
 ## Requirements
 <code>Python >= 3.6</code> <code>Pytorch</code>
 
-All packages used in this repository are listed in [requirements.txt](https://github.com/ahmedgh970/NeRV-plus-plus/blob/main/requirements.txt).
+All packages used in this repository are listed in [requirements.txt](https://github.com/ahmedgh970/nerv-plus-plus/blob/main/requirements.txt).
 To install those, run:
 ```
 pip install -r requirements.txt
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 ## Folder Structure
 ``` 
-NeRV-PlusPlus-main
+nerv-plus-plus-main
 ├── data/                         # Video data dir
 ├── docs/asset                    # Documentation figures               
 ├── selective_scan/               # Selective SSM dir
